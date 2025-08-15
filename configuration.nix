@@ -73,7 +73,7 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
-
+    nixpkgs.config.allowUnfree = true;
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -82,12 +82,10 @@
     isNormalUser = true;
     description = "lysander";
     extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.zsh;
     packages = with pkgs; [
     #  thunderbird
     ];
   };
-  programs.zsh.enable = true;
 
   # Enable automatic login for the user.
   services.displayManager.autoLogin.enable = true;
@@ -112,6 +110,7 @@
      gcc
      xclip
      python314
+     python3
      go
      nodejs_24
      zsh
@@ -119,7 +118,21 @@
      whatsie
      encfs
      tauon
+     localsend
+     discord
+     cargo
+     unzip
+     luajitPackages.luarocks_bootstrap
+     lua
+     lua-language-server
+     stylua
+     prettierd
+     nodePackages.prettier
+     gofumpt
+     nil
   ];
+  programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
   services.auto-cpufreq.enable = true;
   services.power-profiles-daemon.enable = false;
 
@@ -150,4 +163,5 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
 
+  users.users.lysander.shell = pkgs.zsh;
 }
