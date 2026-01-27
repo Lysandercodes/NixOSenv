@@ -212,7 +212,7 @@
   };
 
   # System version & extras
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 
   services.dbus.packages = [ pkgs.glib ];
 
@@ -221,5 +221,15 @@
     binfmt = true;
   };
   programs.nix-ld.enable = true;
+
+  # Automatic updating 
+  system.autoUpgrade.upgrade.enable = true;
+  system.autoUpgrade.dates = "weekly";
+
+  # Automatic cleanup 
+  nix.gc.automatic = true;
+  nix.gc.dates = "daily";
+  nix.gc.options = "--delete-older-than 10";
+  nix.settings.auto-optimise-store = true;
 }
 

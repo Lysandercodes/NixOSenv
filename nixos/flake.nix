@@ -21,9 +21,8 @@
 
         {
           nixpkgs.config.allowUnfree = true;
-          environment.systemPackages = [
-            antigravity-nix.packages.x86_64-linux.default
-          ];
+          environment.systemPackages =
+            [ antigravity-nix.packages.x86_64-linux.default ];
         }
       ];
     };
