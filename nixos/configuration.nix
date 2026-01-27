@@ -222,10 +222,6 @@
   };
   programs.nix-ld.enable = true;
 
-  # Automatic updating 
-  system.autoUpgrade.upgrade.enable = true;
-  system.autoUpgrade.dates = "weekly";
-
   # Automatic cleanup 
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
