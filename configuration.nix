@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... }: {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [ ./hardware-configuration.nix ./cachix.nix ];
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -92,11 +92,18 @@
   environment.systemPackages = with pkgs; [
     # Core tools
     neovim
+    marksman
+    icu
     curl
     wget
     git
     gcc
     unzip
+    cmake
+    fd
+    ripgrep
+    androidenv.androidPkgs.platform-tools
+    syncthing
 
     # Terminals
     gnome-terminal
@@ -171,16 +178,16 @@
     wtype
     nextdns
     uv
+    libreoffice
 
-    # Wine
-    wineWowPackages.stable
-    wine
-    (wine.override { wineBuild = "wine64"; })
-    wine64
-    wineWowPackages.staging
-    wineWowPackages.waylandFull
-    winetricks
-    easyeffects
+    # # Wine
+    # wineWowPackages.stable
+    # wine
+    # (wine.override { wineBuild = "wine64"; })
+    # wine64
+    # wineWowPackages.staging
+    # wineWowPackages.waylandFull
+    # winetricks
 
     # nerd-fonts
     nerd-fonts.noto
@@ -193,7 +200,13 @@
 
     # Cursor-cli
     cursor-cli
+
+    # cachix
+    devenv
+    cachix
+    rsync
   ];
+
   services.flatpak.enable = true;
   xdg.portal.enable = true;
   # Power management
@@ -221,6 +234,106 @@
     binfmt = true;
   };
   programs.nix-ld.enable = true;
+
+  services.syncthing = {
+    enable = true;
+    user = "qwerty";
+    group = "users";
+    configDir = "/home/qwerty/.config/syncthing";
+    dataDir = "/home/qwerty/.config/syncthing";
+
+    openDefaultPorts = false;
+
+    settings = {
+      options = {
+        globalAnnounceEnabled = false;
+        localAnnounceEnabled = true;
+        relaysEnabled = false;
+        natEnabled = false;
+      };
+    };
+
+    overrideDevices = true;
+    overrideFolders = true;
+
+    # Devices: use a short name as key, real ID goes in .id
+    settings.devices = {
+      Friday = {
+        id = "SVSRQY2-UX4DWEG-P3ZILRU-STP2IKF-7BIZLCR-TI3KS6R-V2PVJRW-3I4SRQ5";
+        name = "Friday"; # optional, shows nicely in GUI
+        addresses = [
+          "tcp://192.168.1.2:22000" # your phone's local IP
+        ];
+      };
+    };
+
+    # Folders: reference the device by its attribute name ("phone")
+    settings.folders = {
+      "cxvn6-pfich" = {
+        label = "Music";
+        path = "~/Music";
+        devices = [ "Friday" ];
+        type = "sendreceive"; # adjust if needed
+      };
+
+      "h53c3-35tfw" = {
+        label = "NixOS-config";
+        path = "~/NixOSenv";
+        devices = [ "Friday" ];
+        type = "sendreceive";
+      };
+
+      "kbq2u-oj5d5" = {
+        label = "library";
+        path = "~/Downloads/library";
+        devices = [ "Friday" ];
+        type = "sendreceive";
+      };
+
+      "nnn5g-3fhnc" = {
+        label = "Neovim-config";
+        path = "~/NixOSenv/dotfiles/nvim";
+        devices = [ "Friday" ];
+        type = "sendreceive";
+      };
+    };
+  };
+
+  # Ensure target dir exists + owned by qwerty (runs early during activation)
+  systemd.tmpfiles.rules = [ "d /home/qwerty/NixOSenv 0755 qwerty users - -" ];
+
+  systemd.services.nixos-config-sync = {
+    description = "Sync /etc/nixos to ~/NixOSenv (git repository)";
+
+    serviceConfig = {
+      Type = "oneshot";
+      # Runs as root (needed to read /etc/nixos reliably)
+    };
+
+    script = ''
+      ${pkgs.rsync}/bin/rsync -a --delete \
+        --exclude='.git' \
+        --exclude='*.swp' \
+        --exclude='*~' \
+        --exclude='.direnv' \
+        --exclude='.envrc' \
+        /etc/nixos/ /home/qwerty/NixOSenv/
+
+      # Fix ownership & permissions so you can edit files without sudo
+      ${pkgs.coreutils}/bin/chown -R qwerty:users /home/qwerty/NixOSenv
+      ${pkgs.coreutils}/bin/chmod -R u+rwX,go+rX /home/qwerty/NixOSenv
+    '';
+  };
+
+  systemd.timers.nixos-config-sync = {
+    description = "Daily sync of /etc/nixos to ~/NixOSenv";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "daily"; # midnight; change to e.g. "*-*-* 04:00:00" for 4 AM
+      Persistent = true;
+      RandomizedDelaySec = "15m"; # avoid thundering herd
+    };
+  };
 
   # Automatic cleanup 
   nix.gc.automatic = true;
