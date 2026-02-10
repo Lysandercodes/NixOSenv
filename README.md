@@ -73,4 +73,3 @@ This setup ensures that the `root` user (e.g., when running `sudo nvim`) shares 
 ## ⚠️ Important Notes
 - **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. If you create a new file, `git add` it immediately.
 - **Home Manager**: Both `qwerty` and `root` are managed through the Home Manager module inside the system configuration.
-- **Syncthing**: This needs to be set up for your specific devices, you could modify configuration.nix to add your own device(s).
