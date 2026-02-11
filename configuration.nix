@@ -8,7 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./cachix.nix
-    ./modules/auto-git-nixosenv.nix
+    ./modules/auto-git-nixosenv.nix # automatic git commits and pushes to github using SSH keys
   ];
 
   # Bootloader
