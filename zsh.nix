@@ -1,20 +1,10 @@
 { config, pkgs, lib, ... }: {
-  programs.zsh = {
-    enable = true;
-    
-    # We use initContent to source our "hot-reloadable" .zshrc from dotfiles.
-    # We use lib.mkAfter to ensure this is the very last thing in the generated .zshrc
-    initContent = lib.mkAfter ''
-      source /home/qwerty/NixOSenv/dotfiles/zsh/.zshrc
-    '';
+  # Disable Home Manager's Zsh management to prevent it from generating
+  # its own .zshrc, giving our symlink absolute priority.
+  programs.zsh.enable = false;
 
-    # Completion is fine, but we disable these two because they are loaded 
-    # via oh-my-zsh plugins in the sourced .zshrc above.
-    enableCompletion = true;
-    autosuggestion.enable = false;
-    syntaxHighlighting.enable = false;
-  };
-
-  # Symlink .p10k.zsh to home so the sourced .zshrc can find it easily
+  # Create out-of-store symlinks for the shell configuration files.
+  # This matches the Neovim pattern and ensures changes are instant.
+  home.file.".zshrc".source = config.lib.file.mkOutOfStoreSymlink "/home/qwerty/NixOSenv/dotfiles/zsh/.zshrc";
   home.file.".p10k.zsh".source = config.lib.file.mkOutOfStoreSymlink "/home/qwerty/NixOSenv/dotfiles/zsh/.p10k.zsh";
 }
