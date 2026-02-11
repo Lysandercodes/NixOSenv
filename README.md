@@ -98,17 +98,42 @@ Zsh is the default shell, managed similarly to Neovim to balance system integrat
   - **Apply Changes**: **Instant!** Restart Kitty or press `Ctrl+Shift+F5` (system default) to reload.
   - **Mechanism**: `kitty.nix` creates an out-of-store symlink for the entire `~/.config/kitty` directory.
 
-## 🔄 Automation: Auto-Git & Backup
+## 🔄 Automation: AI-Powered Autocommit
 
-This repository includes a system-level module (`modules/auto-git-nixosenv.nix`) that automates the backup process to GitHub.
+This repository uses a customized version of the [autocommit](https://github.com/e-p-armstrong/autocommit) tool, integrated as a systemd user service (`modules/auto-git-nixosenv.nix`).
 
-- **Auto-Commit (File Watcher)**:
-  - **Mechanism**: A `systemd` user path unit watches `~/NixOSenv` for any file changes.
-  - **Action**: When a change is detected, it automatically runs `git add -A` and commits with a timestamp.
+### Features
+- **AI-Generated Messages**: Uses LLMs (OpenAI, TogetherAI, etc.) to write descriptive commit messages based on `git diff`.
+- **Automatic Sync**: Detects changes and automatically commits/pushes them to GitHub.
+- **Secure Secret Management**: API keys are stored outside the Nix store in a secure local file.
 
-- **Auto-Push (Periodic Timer)**:
-  - **Mechanism**: A `systemd` user timer runs every 10 minutes.
-  - **Action**: If there are unpushed commits, it pushes them to the `main` branch.
+### 🔑 Setup & Configuration
+
+1.  **Configure API Secrets**:
+    Create a file at `~/.config/autocommit/secrets.env` with your provider's details:
+
+    ```bash
+    mkdir -p ~/.config/autocommit
+    cat <<EOF > ~/.config/autocommit/secrets.env
+    AUTOCOMMIT_API_KEY=sk-...
+    AUTOCOMMIT_BASE_URL=https://api.openai.com/v1/
+    AUTOCOMMIT_MODEL=gpt-4o
+    AUTOCOMMIT_PUSH=true
+    AUTOCOMMIT_INTERVAL=30
+    EOF
+    chmod 600 ~/.config/autocommit/secrets.env
+    ```
+
+2.  **Monitor the Service**:
+    View live logs of the AI commit process:
+    ```bash
+    journalctl --user -u auto-git-autocommit -f
+    ```
+
+3.  **Manual Trigger**:
+    The service runs every 30 seconds (configurable via `AUTOCOMMIT_INTERVAL`), automatically detecting and committing changes.
+
+---
 
 ## 🤝 Shared Environment (User + Root)
 
