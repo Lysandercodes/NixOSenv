@@ -8,6 +8,7 @@
   imports = [
     ./hardware-configuration.nix
     ./cachix.nix
+    ./modules/auto-git-nixosenv.nix
   ];
 
   # Bootloader
@@ -222,6 +223,12 @@
     devenv
     cachix
     rsync
+    cmus
+    moc
+    mpd # has options
+    ncmpcpp
+    musikcube
+    kew
   ];
 
   services.flatpak.enable = true;
