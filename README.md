@@ -133,6 +133,33 @@ This repository uses a customized version of the [autocommit](https://github.com
 3.  **Manual Trigger**:
     The service runs every 30 seconds (configurable via `AUTOCOMMIT_INTERVAL`), automatically detecting and committing changes.
 
+### 💡 Using for Other Projects
+
+The `autocommit` tool is globally available on your system as a Nix package. You can use it for any other Git repository:
+
+1.  **Prepare a `config.yaml`**:
+    In the root of your project (or any directory), create a `config.yaml`:
+    ```yaml
+    repo_path: "/path/to/your/project"
+    interval_seconds: 60
+    api_key: "your-api-key"
+    base_url: "https://api.openai.com/v1/"
+    push: true
+    model: "gpt-4o"
+    ```
+
+2.  **Run manually**:
+    ```bash
+    autocommit
+    ```
+    *Note: The tool looks for `config.yaml` in the current working directory.*
+
+3.  **Nix Shell usage**:
+    If you don't want it globally, you can run it via a temporary Nix shell (assuming you are in this `NixOSenv` repo):
+    ```bash
+    nix shell .#autocommit
+    ```
+
 ---
 
 ## 🤝 Shared Environment (User + Root)
