@@ -33,6 +33,17 @@ in
         #!/usr/bin/env bash
         set -euo pipefail
 
+        GIT="${pkgs.git}/bin/git"
+        SSH="${pkgs.openssh}/bin/ssh"
+
+        # Export SSH key for git operations
+        export GIT_SSH_COMMAND="$SSH -i /home/${user}/.ssh/id_ed25519_anon -o IdentitiesOnly=yes"
+
+        # Set local git identity for this repo
+        cd "${repoDir}"
+        $GIT config --local user.name "Lysandercodes"
+        $GIT config --local user.email "lysander2006@proton.me"
+
         # Create a temporary config.yaml that includes the API key from environment
         CONFIG_DIR=$(mktemp -d)
         trap 'rm -rf "$CONFIG_DIR"' EXIT
@@ -54,9 +65,6 @@ timeout: 30
 EOF
 
         # Run the autocommit tool
-        # Note: autocommit.py expects config.yaml in the CWD or passed as arg?
-        # Looking at original code: main(config_file_path)
-        # It defaults to "config.yaml" in the CWD.
         cd "$CONFIG_DIR"
         exec ${pkgs.autocommit}/bin/autocommit
       '';
