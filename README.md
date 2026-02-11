@@ -171,6 +171,7 @@ This setup ensures that the `root` user (e.g., when running `sudo nvim`) shares 
 
 ## ⚠️ Important Notes
 
+- **Syncthing**: Managed as a system-level service. If you see "Failed to acquire lock" errors, it means a rogue user-level process is running. Kill it with `killall syncthing` and restart the system service.
 - **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. If you create a new file, `git add` it immediately.
 - **Home Manager**: Both `qwerty` and `root` are managed through the Home Manager module inside the system configuration.
 - **Syncthing**: You have to set up your own device(s).
