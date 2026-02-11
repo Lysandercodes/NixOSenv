@@ -32,47 +32,57 @@ To apply this configuration to a new or existing NixOS system:
 | **`configuration.nix`** | System-level settings (Kernel, network, global packages, services).                |
 | **`home.nix`**          | Home Manager configuration for the regular user (`qwerty`).                        |
 | **`home-root.nix`**     | Home Manager configuration for the `root` user.                                    |
-| **`nvim.nix`**          | Shared Neovim module. Now includes support for **JS, Python, C/C++, Go, and Zsh**. |
-| **`zsh.nix`**           | Shared Zsh environment module (aliases, p10k).                                     |
-| **`kitty.nix`**         | Shared Kitty terminal module.                                                      |
+| **`nvim.nix`**          | Shared Neovim module. Contains Nix-managed plugins, LSPs, and tools.               |
+| **`zsh.nix`**           | Shared Zsh module. Symlinks `.zshrc` and `.p10k.zsh` from dotfiles.                |
+| **`kitty.nix`**         | Shared Kitty module. Symlinks `~/.config/kitty` from dotfiles.                     |
 | **`dotfiles/`**         | **Source of Truth**. Contains physical Lua, Conf, and Zsh scripts.                 |
 | **`cachix.nix`**        | Binary cache configuration for faster builds.                                      |
 
-## 🛠 Language Support Table
+## 🛠 Configuration Management Guide
 
-| Language       | LSP               | Linter          | Formatter      |
-| :------------- | :---------------- | :-------------- | :------------- |
-| **Go**         | `gopls`           | `golangci-lint` | `gofumpt`      |
-| **Python**     | `pyright`         | `ruff`          | `ruff`         |
-| **JS / TS**    | `ts_ls`, `eslint` | `eslint_d`      | `prettier`     |
-| **C / C++**    | `clangd`          | `cppcheck`      | `clang-format` |
-| **Zsh / Bash** | `bashls`          | `shellcheck`    | `shfmt`        |
-| **Nix**        | `nil_ls`          | -               | `nixfmt`       |
-| **Lua**        | `lua_ls`          | `selene`        | `stylua`       |
-| **Markdown**   | `marksman`        | `markdownlint`  | `prettier`     |
-| **YAML**       | `yamlls`          | `yamllint`      | `yamlfmt`      |
+### 1. Neovim Configuration (`nvim`)
 
-## 🛠 Working Workflow
+Neovim is managed in a hybrid way to offer both stability and flexibility:
 
-### Editing App Configs (Instant Results)
+*   **Plugins & Tools (Nix Managed)**:
+    *   **Where**: `~/NixOSenv/nvim.nix`
+    *   **What**: Language Servers (LSPs), Formatters, Linters, and Neovim Plugins.
+    *   **How to Update**: Edit `nvim.nix` to add/remove packages.
+    *   **Apply Changes**: Run `sudo nixos-rebuild switch --flake .#nixos`.
 
-Configurations for **Neovim, Zsh, and Kitty** are managed via "out-of-store" symlinks. This means you edit the files in `~/NixOSenv/dotfiles/` and the changes are **instant**.
+*   **User Config (Lua Hot-Reload)**:
+    *   **Where**: `~/NixOSenv/dotfiles/nvim/`
+    *   **What**: Keymaps, options, autocommands, and plugin settings (Lua code).
+    *   **How to Update**: Edit files in `dotfiles/nvim/` directly.
+    *   **Apply Changes**: **Instant!** Restart Neovim or source the file. No rebuild needed.
+    *   **Mechanism**: `nvim.nix` creates an out-of-store symlink from `~/.config/nvim` to `~/NixOSenv/dotfiles/nvim`.
 
-- **Neovim**: `~/NixOSenv/dotfiles/nvim/`
-- **Zsh**: `~/NixOSenv/dotfiles/zshrc` and `p10k.zsh`
-- **Kitty**: `~/NixOSenv/dotfiles/kitty/`
+### 2. System Packages & Nix Settings
 
-You do **not** need to run `nixos-rebuild` for simple config/script changes in these directories.
+*   **System Packages**:
+    *   **Where**: `~/NixOSenv/configuration.nix` (under `environment.systemPackages`).
+    *   **How to Update**: Add package names to the list.
+    *   **Apply Changes**: Run `sudo nixos-rebuild switch --flake .#nixos`.
 
-### Modifying Nix Configuration
+*   **Flake Inputs**:
+    *   **Where**: `~/NixOSenv/flake.nix`
+    *   **How to Update**: Run `nix flake update` to update `flake.lock`.
 
-If you add a new package or change a system-level setting:
+### 3. Zsh & Kitty (Managed via Home Manager Symlinks)
 
-1.  Edit the relevant `.nix` file.
-2.  Run `git add .` (Crucial!).
-3.  Run `sudo nixos-rebuild switch --flake .#nixos`.
+**Zsh** and **Kitty** configurations are now symlinked by Home Manager to their source of truth in `~/NixOSenv/dotfiles/`.
 
-OR you could run the alias nrs alias
+*   **Zsh**:
+    *   **Management File**: `~/NixOSenv/zsh.nix`
+    *   **Source of Truth**: `~/NixOSenv/dotfiles/zsh/.zshrc` and `.p10k.zsh`
+    *   **Target**: `~/.zshrc` and `~/.p10k.zsh` linked automatically.
+
+*   **Kitty**:
+    *   **Management File**: `~/NixOSenv/kitty.nix`
+    *   **Source of Truth**: `~/NixOSenv/dotfiles/kitty/`
+    *   **Target**: `~/.config/kitty/` linked automatically.
+
+You can edit files in `dotfiles/zsh/` or `dotfiles/kitty/` and see changes instantly (hot-reload), just like with Neovim.
 
 ## 🤝 Shared Environment (User + Root)
 
@@ -80,6 +90,7 @@ This setup ensures that the `root` user (e.g., when running `sudo nvim`) shares 
 
 ## ⚠️ Important Notes
 
-- **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. If you create a new file, `git add` it immediately.
-- **Home Manager**: Both `qwerty` and `root` are managed through the Home Manager module inside the system configuration.
-- **Syncthing**: You have to set up your own device(s).
+-   **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. If you create a new file, `git add` it immediately.
+-   **Home Manager**: Both `qwerty` and `root` are managed through the Home Manager module inside the system configuration.
+-   **Syncthing**: You have to set up your own device(s).
+

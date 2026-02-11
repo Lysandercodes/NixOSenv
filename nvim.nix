@@ -1,11 +1,12 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+{
   # Neovim configuration
   programs.neovim = {
     enable = true;
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
-    
+
     extraPackages = with pkgs; [
       # LSPs and Formatters (replacing Mason)
       gopls
@@ -40,5 +41,6 @@
 
   # Manage Neovim config directory
   # Note: pointing to the absolute path in qwerty's home to keep configs in sync
-  xdg.configFile."nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/qwerty/NixOSenv/dotfiles/nvim";
+  xdg.configFile."nvim".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/qwerty/NixOSenv/dotfiles/nvim";
 }

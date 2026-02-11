@@ -1,5 +1,14 @@
-{ config, pkgs, lib, ... }: {
-  imports = [ ./hardware-configuration.nix ./cachix.nix ];
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
+  imports = [
+    ./hardware-configuration.nix
+    ./cachix.nix
+  ];
 
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -12,7 +21,9 @@
   # Locale & Time
   time.timeZone = "Africa/Cairo";
   i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = { LC_ALL = "en_US.UTF-8"; };
+  i18n.extraLocaleSettings = {
+    LC_ALL = "en_US.UTF-8";
+  };
 
   # X11 / GNOME
   services.xserver.enable = true;
@@ -37,7 +48,10 @@
   users.users.qwerty = {
     isNormalUser = true;
     description = "qwerty";
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     shell = pkgs.zsh;
   };
 
@@ -80,7 +94,10 @@
   boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
   # Experimental features
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Qt global wrapping
   qt.enable = true;
@@ -221,7 +238,12 @@
   # NextDNS
   services.nextdns = {
     enable = true;
-    arguments = [ "-config" "78326e" "-cache-size" "10MB" ];
+    arguments = [
+      "-config"
+      "78326e"
+      "-cache-size"
+      "10MB"
+    ];
   };
 
   # System version & extras
@@ -254,7 +276,6 @@
     };
 
     overrideDevices = true;
-    overrideFolders = true;
 
     # Devices: use a short name as key, real ID goes in .id
     settings.devices = {
@@ -267,13 +288,12 @@
       };
     };
 
-    # Folders: reference the device by its attribute name ("phone")
     settings.folders = {
       "cxvn6-pfich" = {
         label = "Music";
         path = "~/Music";
         devices = [ "Friday" ];
-        type = "sendreceive"; # adjust if needed
+        type = "sendreceive";
       };
 
       "h53c3-35tfw" = {
@@ -289,56 +309,12 @@
         devices = [ "Friday" ];
         type = "sendreceive";
       };
-
-      "nnn5g-3fhnc" = {
-        label = "Neovim-config";
-        path = "~/NixOSenv/dotfiles/nvim";
-        devices = [ "Friday" ];
-        type = "sendreceive";
-      };
     };
   };
 
-  # Ensure target dir exists + owned by qwerty (runs early during activation)
-  systemd.tmpfiles.rules = [ "d /home/qwerty/NixOSenv 0755 qwerty users - -" ];
-
-  systemd.services.nixos-config-sync = {
-    description = "Sync /etc/nixos to ~/NixOSenv (git repository)";
-
-    serviceConfig = {
-      Type = "oneshot";
-      # Runs as root (needed to read /etc/nixos reliably)
-    };
-
-    script = ''
-      ${pkgs.rsync}/bin/rsync -a --delete \
-        --exclude='.git' \
-        --exclude='*.swp' \
-        --exclude='*~' \
-        --exclude='.direnv' \
-        --exclude='.envrc' \
-        /etc/nixos/ /home/qwerty/NixOSenv/
-
-      # Fix ownership & permissions so you can edit files without sudo
-      ${pkgs.coreutils}/bin/chown -R qwerty:users /home/qwerty/NixOSenv
-      ${pkgs.coreutils}/bin/chmod -R u+rwX,go+rX /home/qwerty/NixOSenv
-    '';
-  };
-
-  systemd.timers.nixos-config-sync = {
-    description = "Daily sync of /etc/nixos to ~/NixOSenv";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "daily"; # midnight; change to e.g. "*-*-* 04:00:00" for 4 AM
-      Persistent = true;
-      RandomizedDelaySec = "15m"; # avoid thundering herd
-    };
-  };
-
-  # Automatic cleanup 
+  # Automatic cleanup
   nix.gc.automatic = true;
   nix.gc.dates = "daily";
   nix.gc.options = "--delete-older-than 10";
   nix.settings.auto-optimise-store = true;
 }
-
