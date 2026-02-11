@@ -115,14 +115,17 @@ This repository uses a customized version of the [autocommit](https://github.com
     ```bash
     mkdir -p ~/.config/autocommit
     cat <<EOF > ~/.config/autocommit/secrets.env
-    AUTOCOMMIT_API_KEY=sk-...
-    AUTOCOMMIT_BASE_URL=https://api.openai.com/v1/
-    AUTOCOMMIT_MODEL=gpt-4o
+    AUTOCOMMIT_API_KEY=sk-or-v1-...
+    AUTOCOMMIT_BASE_URL=https://openrouter.ai/api/v1
+    AUTOCOMMIT_MODEL=google/gemini-flash-1.5:free
     AUTOCOMMIT_PUSH=true
     AUTOCOMMIT_INTERVAL=30
     EOF
     chmod 600 ~/.config/autocommit/secrets.env
     ```
+
+    > [!TIP]
+    > I recommend using **OpenRouter** (Free Tier) as shown above. It offers high-quality models (like Gemini Flash) for free, bypassing OpenAI quota limits.
 
 2.  **Monitor the Service**:
     View live logs of the AI commit process:
@@ -143,9 +146,9 @@ The `autocommit` tool is globally available on your system as a Nix package. You
     repo_path: "/path/to/your/project"
     interval_seconds: 60
     api_key: "your-api-key"
-    base_url: "https://api.openai.com/v1/"
+    base_url: "https://openrouter.ai/api/v1"
     push: true
-    model: "gpt-4o"
+    model: "google/gemini-flash-1.5:free"
     ```
 
 2.  **Run manually**:
