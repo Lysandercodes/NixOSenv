@@ -8,8 +8,7 @@
 let
   user = "qwerty";
   repoDir = "/home/${user}/NixOSenv";
-  branch = "main"; # change to "master" if needed
-
+  branch = "main"; # change to "master" if your default branch is different
 in
 {
   environment.systemPackages = with pkgs; [
@@ -25,16 +24,19 @@ in
       Type = "oneshot";
       WorkingDirectory = repoDir;
       ExecStart = pkgs.writeShellScript "auto-commit-nixosenv-exec" ''
+        #!/usr/bin/env bash
         set -euo pipefail
 
+        GIT="${pkgs.git}/bin/git"
+
         # Set anonymous identity ONLY for this commit
-        git config --local user.name "Lysandercodes" || true
-        git config --local user.email "lysander2006@proton.me" || true
+        $GIT config --local user.name "Lysandercodes" || true
+        $GIT config --local user.email "lysander2006@proton.me" || true
 
         # Only commit if there is something to commit
-        if git status --porcelain | grep -q .; then
-          git add -A .
-          git commit -m "Auto: changes in NixOSenv at $(date '+%Y-%m-%d %H:%M:%S')" || true
+        if $GIT status --porcelain | grep -q .; then
+          $GIT add -A .
+          $GIT commit -m "Auto: changes in NixOSenv at $(date '+%Y-%m-%d %H:%M:%S')" || true
         fi
       '';
       User = user;
@@ -64,25 +66,27 @@ in
     };
   };
 
-  # Push service – no need for identity here (push doesn't sign/author commits)
+  # Push service
   systemd.user.services.auto-push-nixosenv = {
     description = "Push ~/NixOSenv to GitHub if there are unpushed commits";
     serviceConfig = {
       Type = "oneshot";
       WorkingDirectory = repoDir;
       ExecStart = pkgs.writeShellScript "auto-push-nixosenv-exec" ''
+        #!/usr/bin/env bash
         set -euo pipefail
+
+        GIT="${pkgs.git}/bin/git"
 
         export GIT_SSH_COMMAND="ssh -i /home/${user}/.ssh/id_ed25519_anon -o IdentitiesOnly=yes"
 
-        if git rev-list --count origin/${branch}..HEAD > /dev/null 2>&1 && \
-           [ "$(git rev-list --count origin/${branch}..HEAD)" -gt 0 ]; then
-          git push origin ${branch} || true
+        if $GIT rev-list --count origin/${branch}..HEAD > /dev/null 2>&1 && \
+           [ "$($GIT rev-list --count origin/${branch}..HEAD)" -gt 0 ]; then
+          $GIT push origin ${branch} || true
         fi
       '';
       User = user;
       Restart = "on-failure";
     };
   };
-
 }

@@ -223,12 +223,7 @@
     devenv
     cachix
     rsync
-    cmus
-    moc
-    mpd # has options
-    ncmpcpp
-    musikcube
-    kew
+    beets
   ];
 
   services.flatpak.enable = true;
