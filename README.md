@@ -1,5 +1,11 @@
 # NixOS & Home Manager Configuration
 
+## Contents
+
+### Table of contents
+
+<!-- toc -->
+
 This repository contains the complete NixOS system and user environment configuration, managed via **Flakes** and **Home Manager**.
 
 ## 🚀 Quick Start (Reproduction)
@@ -103,6 +109,7 @@ Zsh is the default shell, managed similarly to Neovim to balance system integrat
 This repository uses a customized version of the [autocommit](https://github.com/e-p-armstrong/autocommit) tool, integrated as a systemd user service (`modules/auto-git-nixosenv.nix`).
 
 ### Features
+
 - **AI-Generated Messages**: Uses LLMs (OpenAI, TogetherAI, etc.) to write descriptive commit messages based on `git diff`.
 - **Automatic Sync**: Detects changes and automatically commits/pushes them to GitHub.
 - **Secure Secret Management**: API keys are stored outside the Nix store in a secure local file.
@@ -131,11 +138,12 @@ This repository uses a customized version of the [autocommit](https://github.com
 
 Syncthing is managed primarily via its **Web GUI**.
 
-*   **GUI Access**: [localhost:8384](http://localhost:8384)
-*   **Workflow**: Use the GUI to add devices and folders. The configuration is stored locally in `~/.config/syncthing` and will **persist** across reboots and Nix rebuilds.
-*   **Nix Configuration**: `configuration.nix` simply enables the service and ensures it runs under your user account with the correct data paths. It does **not** override your GUI settings.
+- **GUI Access**: [localhost:8384](http://localhost:8384)
+- **Workflow**: Use the GUI to add devices and folders. The configuration is stored locally in `~/.config/syncthing` and will **persist** across reboots and Nix rebuilds.
+- **Nix Configuration**: `configuration.nix` simply enables the service and ensures it runs under your user account with the correct data paths. It does **not** override your GUI settings.
 
 ### ⚠️ Troubleshooting
+
 - **"Failed to acquire lock"**: This happens if a "ghost" Syncthing process is running under your user account.
   - **Fix**: Run `killall syncthing` and then `sudo systemctl restart syncthing`.
 
