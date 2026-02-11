@@ -20,8 +20,10 @@
   };
 
   outputs = { self, fenix, nixpkgs, antigravity-nix, aussprachetrainer, home-manager, ... }: {
-    packages.x86_64-linux.default =
-      fenix.packages.x86_64-linux.minimal.toolchain;
+    packages.x86_64-linux = {
+      default = fenix.packages.x86_64-linux.minimal.toolchain;
+      autocommit = nixpkgs.legacyPackages.x86_64-linux.callPackage ./modules/autocommit-pkg.nix { };
+    };
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
 
