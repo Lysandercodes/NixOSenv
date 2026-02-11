@@ -1,11 +1,5 @@
 # NixOS & Home Manager Configuration
 
-## Contents
-
-### Table of contents
-
-<!-- toc -->
-
 This repository contains the complete NixOS system and user environment configuration, managed via **Flakes** and **Home Manager**.
 
 ## ✨ Magical One-Command Setup
@@ -60,29 +54,48 @@ nrs
 
 ## 🛠 Configuration Management Guide
 
-    ```
+### 1. Zsh Configuration (`zsh`)
 
-    > [!TIP]
-    > I recommend using **OpenRouter** (Free Tier) as shown above. It offers high-quality models (like Gemini Flash) for free, bypassing OpenAI quota limits.
+Zsh is managed via a direct out-of-store symlink to ensure **absolute priority** and **instant effects**:
 
-## 🛰️ Syncthing Management
+*   **Mechanism**: Home Manager's internal Zsh management is **disabled** (`programs.zsh.enable = false`) to prevent Nix-generated wrapper scripts from overriding your settings.
+*   **Where**: `~/NixOSenv/dotfiles/zshrc`
+*   **How to Update**: Edit `dotfiles/zshrc` directly.
+*   **Apply Changes**: **Instant!** Restart your shell or run `source ~/.zshrc`.
+*   **NixOS Compatibility**: The file includes a boilerplate at the top (`source /etc/zshrc`) to ensure Nix paths and completions work correctly while maintaining your priority.
 
-Syncthing is managed primarily via its **Web GUI**.
+### 2. Neovim Configuration (`nvim`)
 
-- **GUI Access**: [localhost:8384](http://localhost:8384)
-- **Workflow**: Use the GUI to add devices and folders. The configuration is stored locally in `~/.config/syncthing` and will **persist** across reboots and Nix rebuilds.
-- **Nix Configuration**: `configuration.nix` simply enables the service and ensures it runs under your user account with the correct data paths. It does **not** override your GUI settings.
+Neovim follows a similar pattern to Zsh for maximum flexibility:
 
-### ⚠️ Troubleshooting
+*   **External Tools (Nix Managed)**: 
+    *   **Where**: `~/NixOSenv/nvim.nix`
+    *   **What**: Language Servers (LSPs), Formatters, etc.
+    *   **Apply**: `nrs`.
+*   **Config & Plugins (Lua Hot-Reload)**:
+    *   **Where**: `~/NixOSenv/dotfiles/nvim/`
+    *   **Apply**: **Instant!** Restart Neovim or source the file.
+    *   **Mechanism**: `nvim.nix` creates an out-of-store symlink from `~/.config/nvim` to `~/NixOSenv/dotfiles/nvim`.
 
-- **"Failed to acquire lock"**: This happens if a "ghost" Syncthing process is running under your user account.
-  - **Fix**: Run `killall syncthing` and then `sudo systemctl restart syncthing`.
+### 3. Kitty Configuration (`kitty`)
 
-This setup ensures that the `root` user (e.g., when running `sudo nvim`) shares the **exact same environment** as your regular user. Both accounts symlink their config to the same physical files in the `dotfiles/` directory.
+*   **User Config (Hot-Reload)**:
+    *   **Where**: `~/NixOSenv/dotfiles/kitty/`
+    *   **Apply**: **Instant!** Reload Kitty (`Ctrl+Shift+F5`).
+
+## 🔄 Automation: Auto-Git & Backup
+
+This repository includes a system-level module (`modules/auto-git-nixosenv.nix`) that automates the backup process to GitHub.
+
+*   **Auto-Commit**: A systemd unit watches `~/NixOSenv` and commits changes with a timestamp and file list.
+*   **Auto-Push**: A timer pushes to GitHub every 10 minutes using a dedicated anonymous SSH key.
+
+## 🤝 Shared Environment (User + Root)
+
+This setup ensures that the `root` user shares the **exact same environment** as your regular user by symlinking to the same physical `dotfiles/` directory.
 
 ## ⚠️ Important Notes
 
-- **Syncthing**: Managed as a system-level service. If you see "Failed to acquire lock" errors, it means a rogue user-level process is running. Kill it with `killall syncthing` and restart the system service.
-- **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. If you create a new file, `git add` it immediately.
-- **Home Manager**: Both `qwerty` and `root` are managed through the Home Manager module inside the system configuration.
-- **Syncthing**: You have to set up your own device(s).
+-   **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. Use `nrs` to ensure everything is tracked before rebuilding.
+-   **Manual Symlinks**: Upon first installation, ensure the `.zshrc` symlink is created manually or via the "Magical" command.
+-   **Syncthing**: Managed as a system-level service. GUI accessed via [localhost:8384](http://localhost:8384).
