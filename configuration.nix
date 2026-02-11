@@ -280,7 +280,7 @@
     # Devices: use a short name as key, real ID goes in .id
     settings.devices = {
       Friday = {
-        id = "SVSRQY2-UX4DWEG-P3ZILRU-STP2IKF-7BIZLCR-TI3KS6R-V2PVJRW-3I4SRQ5";
+        id = "6GEMF6X-WBQUHOC-4NM2GSK-VHB4DSM-HDZKZQA-BGWMDUR-SIZNSB4-AEN6SQK";
         name = "Friday"; # optional, shows nicely in GUI
         addresses = [
           "tcp://192.168.1.2:22000" # your phone's local IP
@@ -300,7 +300,7 @@
         label = "NixOS-config";
         path = "~/NixOSenv";
         devices = [ "Friday" ];
-        type = "sendreceive";
+        type = "sendonly";
       };
 
       "kbq2u-oj5d5" = {

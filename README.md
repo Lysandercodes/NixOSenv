@@ -68,21 +68,35 @@ Neovim is managed in a hybrid way to offer both stability and flexibility:
     *   **Where**: `~/NixOSenv/flake.nix`
     *   **How to Update**: Run `nix flake update` to update `flake.lock`.
 
-### 3. Zsh & Kitty (Managed via Home Manager Symlinks)
+### 3. Zsh Configuration (`zsh`)
 
-**Zsh** and **Kitty** configurations are now symlinked by Home Manager to their source of truth in `~/NixOSenv/dotfiles/`.
+Zsh is the default shell, managed similarly to Neovim to balance system integration with user customization:
 
-*   **Zsh**:
-    *   **Management File**: `~/NixOSenv/zsh.nix`
-    *   **Source of Truth**: `~/NixOSenv/dotfiles/zsh/.zshrc` and `.p10k.zsh`
-    *   **Target**: `~/.zshrc` and `~/.p10k.zsh` linked automatically.
+*   **Shell & Plugins (Nix Managed)**:
+    *   **Where**: `~/NixOSenv/configuration.nix` (enabled via `programs.zsh.enable = true`).
+    *   **What**: The Zsh binary and system-level environment.
+    *   **Apply Changes**: `sudo nixos-rebuild switch --flake .#nixos`.
 
-*   **Kitty**:
-    *   **Management File**: `~/NixOSenv/kitty.nix`
-    *   **Source of Truth**: `~/NixOSenv/dotfiles/kitty/`
-    *   **Target**: `~/.config/kitty/` linked automatically.
+*   **User Config (Hot-Reload)**:
+    *   **Where**: `~/NixOSenv/dotfiles/zsh/` (`.zshrc`, `.p10k.zsh`).
+    *   **What**: Aliases, Powerlevel10k theme config, interactive shell settings.
+    *   **How to Update**: Edit files in `dotfiles/zsh/` directly.
+    *   **Apply Changes**: **Instant!** Open a new terminal or run `source ~/.zshrc`.
+    *   **Mechanism**: `zsh.nix` creates out-of-store symlinks for `.zshrc` and `.p10k.zsh` pointing to the dotfiles directory.
 
-You can edit files in `dotfiles/zsh/` or `dotfiles/kitty/` and see changes instantly (hot-reload), just like with Neovim.
+### 4. Kitty Configuration (`kitty`)
+
+*   **Terminal App (Nix Managed)**:
+    *   **Where**: `~/NixOSenv/configuration.nix` (installed via `environment.systemPackages`).
+    *   **What**: The Kitty terminal emulator binary.
+    *   **Apply Changes**: `sudo nixos-rebuild switch --flake .#nixos`.
+
+*   **User Config (Hot-Reload)**:
+    *   **Where**: `~/NixOSenv/dotfiles/kitty/` (`kitty.conf`, `current-theme.conf`).
+    *   **What**: Fonts, colors, window layout, keybindings.
+    *   **How to Update**: Edit files in `dotfiles/kitty/` directly.
+    *   **Apply Changes**: **Instant!** Restart Kitty or press `Ctrl+Shift+F5` (system default) to reload.
+    *   **Mechanism**: `kitty.nix` creates an out-of-store symlink for the entire `~/.config/kitty` directory.
 
 ## 🤝 Shared Environment (User + Root)
 
