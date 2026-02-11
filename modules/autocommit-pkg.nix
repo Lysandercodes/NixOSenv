@@ -1,4 +1,6 @@
-{ pkgs ? import <nixpkgs> {} }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 
 pkgs.python3Packages.buildPythonApplication rec {
   pname = "autocommit";
@@ -23,7 +25,7 @@ pkgs.python3Packages.buildPythonApplication rec {
     mkdir -p $out/bin
     mkdir -p $out/lib/autocommit
     cp autocommit.py $out/lib/autocommit/
-    
+
     # We create a wrapper that runs the script with the correct python environment
     makeWrapper ${pkgs.python3}/bin/python $out/bin/autocommit \
       --add-flags "$out/lib/autocommit/autocommit.py" \
