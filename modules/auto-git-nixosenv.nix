@@ -13,89 +13,53 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
-    inotify-tools
+    autocommit
     git
     openssh
   ];
 
-  # 1. Consolidated Sync Service (Commit + Push)
-  systemd.user.services.auto-git-sync = {
-    description = "Sync changes in ~/NixOSenv to GitHub";
-    serviceConfig = {
-      Type = "oneshot";
-      WorkingDirectory = repoDir;
-      ExecStart = pkgs.writeShellScript "auto-git-sync-exec" ''
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        GIT="${pkgs.git}/bin/git"
-        SSH="${pkgs.openssh}/bin/ssh"
-
-        export GIT_SSH_COMMAND="$SSH -i /home/${user}/.ssh/id_ed25519_anon -o IdentitiesOnly=yes"
-
-        # Set identity for auto-commits
-        $GIT config --local user.name "Lysandercodes" || true
-        $GIT config --local user.email "lysander2006@proton.me" || true
-
-        echo "--- Sync starting at $(date) ---"
-
-        # Check for changes
-        if $GIT status --porcelain | grep -q .; then
-          echo "Changes detected. Committing..."
-          $GIT add -A .
-          $GIT commit -m "Auto: changes in NixOSenv at $(date '+%Y-%m-%d %H:%M:%S')" || true
-        else
-          echo "No local changes to commit."
-        fi
-
-        # Push if there are unpushed commits
-        echo "Checking for unpushed commits..."
-        $GIT fetch origin || { echo "Fetch failed, skipping push." >&2; exit 0; }
-
-        AHEAD_COUNT=$($GIT rev-list --count origin/${branch}..HEAD 2>/dev/null || echo 0)
-        if [ "$AHEAD_COUNT" -gt 0 ]; then
-          echo "Pushing $AHEAD_COUNT commit(s) to origin/${branch}..."
-          $GIT push origin ${branch} || { echo "Push failed." >&2; exit 0; }
-          echo "Push successful."
-        else
-          echo "No commits to push."
-        fi
-        echo "--- Sync completed ---"
-      '';
-      User = user;
-    };
-  };
-
-  # 2. Recursive File Watcher Service
-  systemd.user.services.auto-git-watcher = {
-    description = "Recursive watcher for ~/NixOSenv";
+  # 1. Autocommit Service
+  systemd.user.services.auto-git-autocommit = {
+    description = "AI-powered Autocommit for ~/NixOSenv";
     wantedBy = [ "default.target" ];
+    
+    # We use an EnvironmentFile to store the API key securely.
+    # The user should create this file at ~/.config/autocommit/secrets.env
+    # with the content: AUTOCOMMIT_API_KEY=sk-...
     serviceConfig = {
-      Type = "simple";
-      ExecStart = pkgs.writeShellScript "auto-git-watcher-exec" ''
+      EnvironmentFile = "-%h/.config/autocommit/secrets.env";
+      WorkingDirectory = repoDir;
+      ExecStart = pkgs.writeShellScript "autocommit-wrapper" ''
         #!/usr/bin/env bash
         set -euo pipefail
 
-        WATCHER="${pkgs.inotify-tools}/bin/inotifywait"
-        SYSTEMCTL="${pkgs.systemd}/bin/systemctl"
+        # Create a temporary config.yaml that includes the API key from environment
+        CONFIG_DIR=$(mktemp -d)
+        trap 'rm -rf "$CONFIG_DIR"' EXIT
 
-        echo "Starting recursive watch on ${repoDir}..."
-        
-        # Watch recursively (-r), exit on first event to trigger sync
-        # Exclude .git directory to avoid infinite loops
-        while true; do
-          $WATCHER -r -e modify -e create -e delete -e move \
-            --exclude "/\.git/" \
-            "${repoDir}"
-          
-          echo "Change detected! Triggering sync..."
-          $SYSTEMCTL --user start auto-git-sync.service
-          
-          # Coalesce rapid changes
-          sleep 5
-        done
+        # Default values or override via environment
+        BASE_URL=''${AUTOCOMMIT_BASE_URL:-"https://api.openai.com/v1/"}
+        MODEL=''${AUTOCOMMIT_MODEL:-"gpt-3.5-turbo"}
+        PUSH=''${AUTOCOMMIT_PUSH:-"true"}
+        INTERVAL=''${AUTOCOMMIT_INTERVAL:-"30"}
+
+        cat > "$CONFIG_DIR/config.yaml" <<EOF
+repo_path: "${repoDir}"
+interval_seconds: $INTERVAL
+api_key: "$AUTOCOMMIT_API_KEY"
+base_url: "$BASE_URL"
+push: $PUSH
+model: "$MODEL"
+timeout: 30
+EOF
+
+        # Run the autocommit tool
+        # Note: autocommit.py expects config.yaml in the CWD or passed as arg?
+        # Looking at original code: main(config_file_path)
+        # It defaults to "config.yaml" in the CWD.
+        cd "$CONFIG_DIR"
+        exec ${pkgs.autocommit}/bin/autocommit
       '';
-      User = user;
       Restart = "always";
       RestartSec = "10s";
     };

@@ -39,7 +39,12 @@
           ];
         }
         ({ pkgs, ... }: {
-          nixpkgs.overlays = [ fenix.overlays.default ];
+          nixpkgs.overlays = [ 
+            fenix.overlays.default 
+            (final: prev: {
+              autocommit = final.callPackage ./modules/autocommit-pkg.nix {};
+            })
+          ];
           environment.systemPackages = [
             (pkgs.fenix.complete.withComponents [
               "cargo"
