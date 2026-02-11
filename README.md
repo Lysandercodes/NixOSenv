@@ -127,45 +127,17 @@ This repository uses a customized version of the [autocommit](https://github.com
     > [!TIP]
     > I recommend using **OpenRouter** (Free Tier) as shown above. It offers high-quality models (like Gemini Flash) for free, bypassing OpenAI quota limits.
 
-2.  **Monitor the Service**:
-    View live logs of the AI commit process:
-    ```bash
-    journalctl --user -u auto-git-autocommit -f
-    ```
+## 🛰️ Syncthing Management
 
-3.  **Manual Trigger**:
-    The service runs every 30 seconds (configurable via `AUTOCOMMIT_INTERVAL`), automatically detecting and committing changes.
+Syncthing is managed primarily via its **Web GUI**.
 
-### 💡 Using for Other Projects
+*   **GUI Access**: [localhost:8384](http://localhost:8384)
+*   **Workflow**: Use the GUI to add devices and folders. The configuration is stored locally in `~/.config/syncthing` and will **persist** across reboots and Nix rebuilds.
+*   **Nix Configuration**: `configuration.nix` simply enables the service and ensures it runs under your user account with the correct data paths. It does **not** override your GUI settings.
 
-The `autocommit` tool is globally available on your system as a Nix package. You can use it for any other Git repository:
-
-1.  **Prepare a `config.yaml`**:
-    In the root of your project (or any directory), create a `config.yaml`:
-    ```yaml
-    repo_path: "/path/to/your/project"
-    interval_seconds: 60
-    api_key: "your-api-key"
-    base_url: "https://openrouter.ai/api/v1"
-    push: true
-    model: "google/gemini-flash-1.5:free"
-    ```
-
-2.  **Run manually**:
-    ```bash
-    autocommit
-    ```
-    *Note: The tool looks for `config.yaml` in the current working directory.*
-
-3.  **Nix Shell usage**:
-    If you don't want it globally, you can run it via a temporary Nix shell (assuming you are in this `NixOSenv` repo):
-    ```bash
-    nix shell .#autocommit
-    ```
-
----
-
-## 🤝 Shared Environment (User + Root)
+### ⚠️ Troubleshooting
+- **"Failed to acquire lock"**: This happens if a "ghost" Syncthing process is running under your user account.
+  - **Fix**: Run `killall syncthing` and then `sudo systemctl restart syncthing`.
 
 This setup ensures that the `root` user (e.g., when running `sudo nvim`) shares the **exact same environment** as your regular user. Both accounts symlink their config to the same physical files in the `dotfiles/` directory.
 

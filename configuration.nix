@@ -265,53 +265,7 @@
     group = "users";
     configDir = "/home/qwerty/.config/syncthing";
     dataDir = "/home/qwerty/.config/syncthing";
-
     openDefaultPorts = false;
-
-    settings = {
-      options = {
-        globalAnnounceEnabled = false;
-        localAnnounceEnabled = true;
-        relaysEnabled = false;
-        natEnabled = false;
-      };
-    };
-
-    overrideDevices = true;
-
-    # Devices: use a short name as key, real ID goes in .id
-    settings.devices = {
-      Friday = {
-        id = "6GEMF6X-WBQUHOC-4NM2GSK-VHB4DSM-HDZKZQA-BGWMDUR-SIZNSB4-AEN6SQK";
-        name = "Friday"; # optional, shows nicely in GUI
-        addresses = [
-          "tcp://192.168.1.2:22000" # your phone's local IP
-        ];
-      };
-    };
-
-    settings.folders = {
-      "cxvn6-pfich" = {
-        label = "Music";
-        path = "~/Music";
-        devices = [ "Friday" ];
-        type = "sendreceive";
-      };
-
-      "h53c3-35tfw" = {
-        label = "NixOS-config";
-        path = "~/NixOSenv";
-        devices = [ "Friday" ];
-        type = "sendonly";
-      };
-
-      "kbq2u-oj5d5" = {
-        label = "library";
-        path = "~/Downloads/library";
-        devices = [ "Friday" ];
-        type = "sendreceive";
-      };
-    };
   };
 
   # Automatic cleanup
