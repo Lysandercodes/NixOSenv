@@ -44,15 +44,15 @@ To apply this configuration to a new or existing NixOS system:
 
 Neovim is managed in a hybrid way to offer both stability and flexibility:
 
-*   **Plugins & Tools (Nix Managed)**:
+*   **External Tools (Nix Managed)**:
     *   **Where**: `~/NixOSenv/nvim.nix`
-    *   **What**: Language Servers (LSPs), Formatters, Linters, and Neovim Plugins.
+    *   **What**: Language Servers (LSPs), Formatters, Linters, and Debuggers.
     *   **How to Update**: Edit `nvim.nix` to add/remove packages.
     *   **Apply Changes**: Run `sudo nixos-rebuild switch --flake .#nixos`.
 
-*   **User Config (Lua Hot-Reload)**:
+*   **Neovim Configuration & Plugins (Lua Hot-Reload)**:
     *   **Where**: `~/NixOSenv/dotfiles/nvim/`
-    *   **What**: Keymaps, options, autocommands, and plugin settings (Lua code).
+    *   **What**: `init.lua`, Plugin management (`lazy.nvim`), Keymaps, and options.
     *   **How to Update**: Edit files in `dotfiles/nvim/` directly.
     *   **Apply Changes**: **Instant!** Restart Neovim or source the file. No rebuild needed.
     *   **Mechanism**: `nvim.nix` creates an out-of-store symlink from `~/.config/nvim` to `~/NixOSenv/dotfiles/nvim`.

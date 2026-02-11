@@ -36,6 +36,7 @@
       nixfmt-rfc-style # nix format
       cppcheck # c++ lint
       icu
+      lua-language-server
     ];
   };
 
