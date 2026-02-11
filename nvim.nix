@@ -33,7 +33,7 @@
       isort # python import sort
       nodePackages.prettier
       nodePackages.eslint_d
-      nixfmt-rfc-style
+      nixfmt
       cppcheck
       icu
       lua-language-server
