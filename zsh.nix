@@ -1,17 +1,18 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, lib, ... }: {
   programs.zsh = {
     enable = true;
     
-    # We use initExtra to source our "hot-reloadable" .zshrc from dotfiles.
-    # This matches the pattern of managing the tool via Nix but the config via symlinks.
-    initContent = ''
+    # We use initContent to source our "hot-reloadable" .zshrc from dotfiles.
+    # We use lib.mkAfter to ensure this is the very last thing in the generated .zshrc
+    initContent = lib.mkAfter ''
       source /home/qwerty/NixOSenv/dotfiles/zsh/.zshrc
     '';
 
-    # Optional: HM can still handle these, and they will be integrated into the final .zshrc
+    # Completion is fine, but we disable these two because they are loaded 
+    # via oh-my-zsh plugins in the sourced .zshrc above.
     enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
+    autosuggestion.enable = false;
+    syntaxHighlighting.enable = false;
   };
 
   # Symlink .p10k.zsh to home so the sourced .zshrc can find it easily
