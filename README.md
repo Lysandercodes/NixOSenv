@@ -8,127 +8,58 @@
 
 This repository contains the complete NixOS system and user environment configuration, managed via **Flakes** and **Home Manager**.
 
-## 🚀 Quick Start (Reproduction)
+## ✨ Magical One-Command Setup
 
-To apply this configuration to a new or existing NixOS system:
+Run this single command on a fresh system to clone the repo, set up essential symlinks, and apply the configuration:
 
-1.  **Clone the repository** (if not already present):
+```bash
+git clone https://github.com/Lysandercodes/NixOSenv.git ~/NixOSenv && ln -sf ~/NixOSenv/dotfiles/zshrc ~/.zshrc && mkdir -p ~/.config/autocommit && touch ~/.config/autocommit/secrets.env && cd ~/NixOSenv && git add . && sudo nixos-rebuild switch --flake .#nixos
+```
 
+## 🚀 Quick Start (Manual)
+
+If you've already cloned the repo or prefer manual steps:
+
+1.  **Symlink `.zshrc`** (Critical for priority and NixOS compatibility):
     ```bash
-    git clone <repo-url> ~/NixOSenv
-    cd ~/NixOSenv
+    ln -sf ~/NixOSenv/dotfiles/zshrc ~/.zshrc
     ```
 
 2.  **Add all files to Git** (Flakes ignore untracked files!):
-
     ```bash
-    git add .
+    git -C ~/NixOSenv add .
     ```
 
 3.  **Apply the configuration**:
     ```bash
-    sudo nixos-rebuild switch --flake .#nixos
+    sudo nixos-rebuild switch --flake ~/NixOSenv#nixos
     ```
+
+## 🪄 Instant Rebuild & Sync Alias
+
+Use the `nrs` alias to add all changes and rebuild the system in one go:
+```bash
+nrs
+```
+*(Defined in `dotfiles/zshrc`)*
 
 ## 📂 File Structure
 
-| File / Directory        | Description                                                          |
-| :---------------------- | :------------------------------------------------------------------- |
-| **`flake.nix`**         | Entry point of the configuration. Defines inputs and user outputs.   |
-| **`configuration.nix`** | System-level settings (Kernel, network, global packages, services).  |
-| **`home.nix`**          | Home Manager configuration for the regular user (`qwerty`).          |
-| **`home-root.nix`**     | Home Manager configuration for the `root` user.                      |
-| **`nvim.nix`**          | Shared Neovim module. Contains Nix-managed plugins, LSPs, and tools. |
-| **`zsh.nix`**           | Shared Zsh module. Symlinks `.zshrc` and `.p10k.zsh` from dotfiles.  |
-| **`kitty.nix`**         | Shared Kitty module. Symlinks `~/.config/kitty` from dotfiles.       |
-| **`dotfiles/`**         | **Source of Truth**. Contains physical Lua, Conf, and Zsh scripts.   |
-| **`cachix.nix`**        | Binary cache configuration for faster builds.                        |
+| File / Directory        | Description                                                                        |
+| :---------------------- | :--------------------------------------------------------------------------------- |
+| **`flake.nix`**         | Entry point of the configuration. Defines inputs and user outputs.                 |
+| **`configuration.nix`** | System-level settings (Kernel, network, global packages, services).                |
+| **`home.nix`**          | Home Manager configuration for the regular user (`qwerty`).                        |
+| **`home-root.nix`**     | Home Manager configuration for the `root` user.                                    |
+| **`nvim.nix`**          | Shared Neovim module. Manages LSPs/tools and symlinks dotfiles.                    |
+| **`zsh.nix`**           | Zsh module. **Disables HM Zsh management** to allow a direct symlink to dotfiles.  |
+| **`kitty.nix`**         | Shared Kitty module. Symlinks `~/.config/kitty` from dotfiles.                     |
+| **`dotfiles/`**         | **Source of Truth**. Contains physical Lua, Conf, and Zsh scripts.                 |
+| **`dotfiles/zshrc`**    | The primary `.zshrc` source file (linked to `~/.zshrc`).                           |
+| **`cachix.nix`**        | Binary cache configuration for faster builds.                                      |
 
 ## 🛠 Configuration Management Guide
 
-### 1. Neovim Configuration (`nvim`)
-
-Neovim is managed in a hybrid way to offer both stability and flexibility:
-
-- **External Tools (Nix Managed)**:
-  - **Where**: `~/NixOSenv/nvim.nix`
-  - **What**: Language Servers (LSPs), Formatters, Linters, and Debuggers.
-  - **How to Update**: Edit `nvim.nix` to add/remove packages.
-  - **Apply Changes**: Run `sudo nixos-rebuild switch --flake .#nixos`.
-
-- **Neovim Configuration & Plugins (Lua Hot-Reload)**:
-  - **Where**: `~/NixOSenv/dotfiles/nvim/`
-  - **What**: `init.lua`, Plugin management (`lazy.nvim`), Keymaps, and options.
-  - **How to Update**: Edit files in `dotfiles/nvim/` directly.
-  - **Apply Changes**: **Instant!** Restart Neovim or source the file. No rebuild needed.
-  - **Mechanism**: `nvim.nix` creates an out-of-store symlink from `~/.config/nvim` to `~/NixOSenv/dotfiles/nvim`.
-
-### 2. System Packages & Nix Settings
-
-- **System Packages**:
-  - **Where**: `~/NixOSenv/configuration.nix` (under `environment.systemPackages`).
-  - **How to Update**: Add package names to the list.
-  - **Apply Changes**: Run `sudo nixos-rebuild switch --flake .#nixos`.
-
-- **Flake Inputs**:
-  - **Where**: `~/NixOSenv/flake.nix`
-  - **How to Update**: Run `nix flake update` to update `flake.lock`.
-
-### 3. Zsh Configuration (`zsh`)
-
-Zsh is the default shell, managed similarly to Neovim to balance system integration with user customization:
-
-- **Shell & Plugins (Nix Managed)**:
-  - **Where**: `~/NixOSenv/configuration.nix` (enabled via `programs.zsh.enable = true`).
-  - **What**: The Zsh binary and system-level environment.
-  - **Apply Changes**: `sudo nixos-rebuild switch --flake .#nixos`.
-
-- **User Config (Hot-Reload)**:
-  - **Where**: `~/NixOSenv/dotfiles/zsh/` (`.zshrc`, `.p10k.zsh`).
-  - **What**: Aliases, Powerlevel10k theme config, interactive shell settings.
-  - **How to Update**: Edit files in `dotfiles/zsh/` directly.
-  - **Apply Changes**: **Instant!** Open a new terminal or run `source ~/.zshrc`.
-  - **Mechanism**: `zsh.nix` creates out-of-store symlinks for `.zshrc` and `.p10k.zsh` pointing to the dotfiles directory.
-
-### 4. Kitty Configuration (`kitty`)
-
-- **Terminal App (Nix Managed)**:
-  - **Where**: `~/NixOSenv/configuration.nix` (installed via `environment.systemPackages`).
-  - **What**: The Kitty terminal emulator binary.
-  - **Apply Changes**: `sudo nixos-rebuild switch --flake .#nixos`.
-
-- **User Config (Hot-Reload)**:
-  - **Where**: `~/NixOSenv/dotfiles/kitty/` (`kitty.conf`, `current-theme.conf`).
-  - **What**: Fonts, colors, window layout, keybindings.
-  - **How to Update**: Edit files in `dotfiles/kitty/` directly.
-  - **Apply Changes**: **Instant!** Restart Kitty or press `Ctrl+Shift+F5` (system default) to reload.
-  - **Mechanism**: `kitty.nix` creates an out-of-store symlink for the entire `~/.config/kitty` directory.
-
-## 🔄 Automation: AI-Powered Autocommit
-
-This repository uses a customized version of the [autocommit](https://github.com/e-p-armstrong/autocommit) tool, integrated as a systemd user service (`modules/auto-git-nixosenv.nix`).
-
-### Features
-
-- **AI-Generated Messages**: Uses LLMs (OpenAI, TogetherAI, etc.) to write descriptive commit messages based on `git diff`.
-- **Automatic Sync**: Detects changes and automatically commits/pushes them to GitHub.
-- **Secure Secret Management**: API keys are stored outside the Nix store in a secure local file.
-
-### 🔑 Setup & Configuration
-
-1.  **Configure API Secrets**:
-    Create a file at `~/.config/autocommit/secrets.env` with your provider's details:
-
-    ```bash
-    mkdir -p ~/.config/autocommit
-    cat <<EOF > ~/.config/autocommit/secrets.env
-    AUTOCOMMIT_API_KEY=sk-or-v1-...
-    AUTOCOMMIT_BASE_URL=https://openrouter.ai/api/v1
-    AUTOCOMMIT_MODEL=google/gemini-flash-1.5:free
-    AUTOCOMMIT_PUSH=true
-    AUTOCOMMIT_INTERVAL=30
-    EOF
-    chmod 600 ~/.config/autocommit/secrets.env
     ```
 
     > [!TIP]
