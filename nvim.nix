@@ -31,10 +31,10 @@
       ruff # python lint/format
       black # python format
       isort # python import sort
-      nodePackages.prettier # js/ts/md format
-      nodePackages.eslint_d # js/ts lint
-      nixfmt-rfc-style # nix format
-      cppcheck # c++ lint
+      nodePackages.prettier
+      nodePackages.eslint_d
+      nixfmt-rfc-style
+      cppcheck
       icu
       lua-language-server
     ];
