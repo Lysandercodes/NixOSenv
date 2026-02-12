@@ -1,7 +1,6 @@
 { config, pkgs, ... }: {
   imports = [
     ./nvim.nix
-    ./zsh.nix
     ./kitty.nix
   ];
 
