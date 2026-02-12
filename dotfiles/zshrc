@@ -43,6 +43,7 @@ alias tmpl2html='for f in *.tmpl; do mv -- "$f" "${f%.tmpl}.html"; done'
 alias todo_update='notes.sh ~/text/todo-TODAY'
 alias flatpak-builder='flatpak run org.flatpak.Builder'
 alias vi='nvim'
+alias vs='cd ~/NixOSenv/ && nvim'
 alias vic='cd ~/.config/nvim/ && nvim'
 alias charlie-kirk='cd ~/Charlie-Kirkification-nix-support/charlie-kirk-project && nix-shell --run "python main.py"'
 alias nr="git -C ~/NixOSenv add . && sudo nixos-rebuild switch --flake ~/NixOSenv#nixos"
