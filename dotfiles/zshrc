@@ -46,4 +46,3 @@ alias vi='nvim'
 alias vic='cd ~/.config/nvim/ && nvim'
 alias charlie-kirk='cd ~/Charlie-Kirkification-nix-support/charlie-kirk-project && nix-shell --run "python main.py"'
 alias nr="git -C ~/NixOSenv add . && sudo nixos-rebuild switch --flake ~/NixOSenv#nixos"
-alias nix-setup='git clone https://github.com/Lysandercodes/NixOSenv.git ~/NixOSenv && ln -sf ~/NixOSenv/dotfiles/zshrc ~/.zshrc && mkdir -p ~/.config/autocommit && touch ~/.config/autocommit/secrets.env && cd ~/NixOSenv && git add . && sudo nixos-rebuild switch --flake .#nixos'
