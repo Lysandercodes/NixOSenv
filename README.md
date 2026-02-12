@@ -7,17 +7,20 @@ This repository contains the complete NixOS system and user environment configur
 Run this single command on a fresh system to clone the repo, set up essential symlinks, and apply the configuration:
 
 ```bash
-git clone https://github.com/Lysandercodes/NixOSenv.git ~/NixOSenv && ln -sf ~/NixOSenv/dotfiles/zshrc ~/.zshrc && mkdir -p ~/.config/autocommit && touch ~/.config/autocommit/secrets.env && cd ~/NixOSenv && git add . && sudo nixos-rebuild switch --flake .#nixos
+git clone https://github.com/Lysandercodes/NixOSenv.git ~/NixOSenv && ln -sf ~/NixOSenv/dotfiles/zsh/.zshrc ~/.zshrc && ln -sf ~/NixOSenv/dotfiles/zsh/.p10k.zsh ~/.p10k.zsh && mkdir -p ~/.config/autocommit && touch ~/.config/autocommit/secrets.env && cd ~/NixOSenv && git add . && sudo nixos-rebuild switch --flake .#nixos
 ```
+
 
 ## 🚀 Quick Start (Manual)
 
 If you've already cloned the repo or prefer manual steps:
 
-1.  **Symlink `.zshrc`** (Critical for priority and NixOS compatibility):
+1.  **Symlink `.zshrc` and `.p10k.zsh`** (Critical for priority and NixOS compatibility):
     ```bash
-    ln -sf ~/NixOSenv/dotfiles/zshrc ~/.zshrc
+    ln -sf ~/NixOSenv/dotfiles/zsh/.zshrc ~/.zshrc
+    ln -sf ~/NixOSenv/dotfiles/zsh/.p10k.zsh ~/.p10k.zsh
     ```
+
 
 2.  **Add all files to Git** (Flakes ignore untracked files!):
     ```bash
@@ -35,7 +38,8 @@ Use the `nrs` alias to add all changes and rebuild the system in one go:
 ```bash
 nrs
 ```
-*(Defined in `dotfiles/zshrc`)*
+*(Defined in `dotfiles/zsh/.zshrc`)*
+
 
 ## 📂 File Structure
 
@@ -46,10 +50,10 @@ nrs
 | **`home.nix`**          | Home Manager configuration for the regular user (`qwerty`).                        |
 | **`home-root.nix`**     | Home Manager configuration for the `root` user.                                    |
 | **`nvim.nix`**          | Shared Neovim module. Manages LSPs/tools and symlinks dotfiles.                    |
-| **`zsh.nix`**           | Zsh module. **Disables HM Zsh management** to allow a direct symlink to dotfiles.  |
+| **`zsh.nix`**           | **[DELETED]** Zsh module (Previously disabled HM Zsh management).                  |
 | **`kitty.nix`**         | Shared Kitty module. Symlinks `~/.config/kitty` from dotfiles.                     |
 | **`dotfiles/`**         | **Source of Truth**. Contains physical Lua, Conf, and Zsh scripts.                 |
-| **`dotfiles/zshrc`**    | The primary `.zshrc` source file (linked to `~/.zshrc`).                           |
+| **`dotfiles/zsh/`**     | Contains `.zshrc` and `.p10k.zsh` (linked to `~/.zshrc` and `~/.p10k.zsh`).         |
 | **`cachix.nix`**        | Binary cache configuration for faster builds.                                      |
 
 ## 🛠 Configuration Management Guide
@@ -58,10 +62,11 @@ nrs
 
 Zsh is managed via a direct out-of-store symlink to ensure **absolute priority** and **instant effects**:
 
-*   **Mechanism**: Home Manager's internal Zsh management is **disabled** (`programs.zsh.enable = false`) to prevent Nix-generated wrapper scripts from overriding your settings.
-*   **Where**: `~/NixOSenv/dotfiles/zshrc`
-*   **How to Update**: Edit `dotfiles/zshrc` directly.
+*   **Mechanism**: Home Manager Zsh management is **completely removed** (`zsh.nix` deleted) to ensure full control via manual symlinks.
+*   **Where**: `~/NixOSenv/dotfiles/zsh/.zshrc` and `~/NixOSenv/dotfiles/zsh/.p10k.zsh`
+*   **How to Update**: Edit files in `dotfiles/zsh/` directly.
 *   **Apply Changes**: **Instant!** Restart your shell or run `source ~/.zshrc`.
+
 *   **NixOS Compatibility**: The file includes a boilerplate at the top (`source /etc/zshrc`) to ensure Nix paths and completions work correctly while maintaining your priority.
 
 ### 2. Neovim Configuration (`nvim`)
@@ -97,5 +102,6 @@ This setup ensures that the `root` user shares the **exact same environment** as
 ## ⚠️ Important Notes
 
 -   **Git is Mandatory**: Nix Flakes will fail to find files that aren't tracked by Git. Use `nrs` to ensure everything is tracked before rebuilding.
--   **Manual Symlinks**: Upon first installation, ensure the `.zshrc` symlink is created manually or via the "Magical" command.
+-   **Manual Symlinks**: Upon first installation, ensure the `.zshrc` and `.p10k.zsh` symlinks are created manually or via the "Magical" command.
+
 -   **Syncthing**: Managed as a system-level service. GUI accessed via [localhost:8384](http://localhost:8384).
