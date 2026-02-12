@@ -45,4 +45,4 @@ alias vc='cd ~/.config/nvim/ && nvim'
 alias vs='cd ~/NixOSenv/ && nvim'
 alias charlie-kirk='cd ~/Charlie-Kirkification-nix-support/charlie-kirk-project && nix-shell --run "python main.py"'
 alias nr="cd ~qwerty/NixOSenv && lysander-git && git -C ~/NixOSenv add . && sudo nixos-rebuild switch --flake ~/NixOSenv#nixos"
-alias c='cmus'
+alias g='nvim ~/GermanMechatronics/'
