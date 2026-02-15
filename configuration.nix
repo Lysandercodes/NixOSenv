@@ -115,6 +115,7 @@
     curl
     wget
     git
+    gitkraken
     gcc
     unzip
     cmake
