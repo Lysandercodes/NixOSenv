@@ -33,7 +33,7 @@ export PATH=$PATH:/home/qwerty/go/bin
 # Aliases
 alias nvchad='NVIM_APPNAME=nvchad nvim'
 alias n='nvim'
-alias lysander-git='git config user.name --locally "Lysandercodes" && git config user.email --locally "lysander2006@proton.me"'
+alias lysander-git='git config --local user.name "Lysandercodes" && git config --local user.email "lysander2006@proton.me"'
 alias showgitcreds='git config --list'
 alias lysandergitsshcommand='export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_ed25519_anon"'
 alias ui='~/code/snippetbox/ui/html/pages'
