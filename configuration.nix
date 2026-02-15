@@ -49,8 +49,6 @@
   users.users.qwerty = {
     isNormalUser = true;
     description = "qwerty";
-    createHome = true;
-    home = "/home/qwerty/";
     extraGroups = [
       "wheel"
       "networkmanager"
