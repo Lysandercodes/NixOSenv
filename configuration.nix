@@ -123,6 +123,7 @@
     ripgrep
     androidenv.androidPkgs.platform-tools
     syncthing
+    unixtools.xxd
 
     # Terminals
     gnome-terminal
