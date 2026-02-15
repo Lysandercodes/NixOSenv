@@ -124,6 +124,7 @@
     androidenv.androidPkgs.platform-tools
     syncthing
     unixtools.xxd
+    pandoc
 
     # Terminals
     gnome-terminal
