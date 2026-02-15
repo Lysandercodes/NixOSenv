@@ -27,7 +27,7 @@
 
     # Nice defaults (you can remove or change any of these)
     extraConfig = {
-      init.defaultBranch = "main"; # modern default instead of master
+      init.defaultBranch = "master"; # modern default instead of master
       core.editor = "nvim"; # or "vim", "nano", etc. — optional
       # pull.rebase          = false;      # or true if you prefer rebase on pull
       # credential.helper    = "cache";    # or "store" / "osxkeychain" etc.
