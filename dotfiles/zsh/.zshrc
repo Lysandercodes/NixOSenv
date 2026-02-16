@@ -47,3 +47,4 @@ alias charlie-kirk='cd ~/Charlie-Kirkification-nix-support/charlie-kirk-project 
 alias nr="cd ~qwerty/NixOSenv && lysander-git && git -C ~/NixOSenv add . && sudo nixos-rebuild switch --flake ~/NixOSenv#nixos"
 alias g='cd ~/GermanMechatronics/ && nvim'
 alias t='cd ~/text/ && nvim'
+alias push_over_https='xclip -sel c < push_over_http'
