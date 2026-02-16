@@ -125,6 +125,7 @@
     syncthing
     unixtools.xxd
     pandoc
+    zoom-us
 
     # Terminals
     gnome-terminal
