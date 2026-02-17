@@ -126,7 +126,6 @@
     unixtools.xxd
     pandoc
     zoom-us
-    scdl
 
     # Terminals
     gnome-terminal
