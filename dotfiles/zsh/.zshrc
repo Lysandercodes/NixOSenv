@@ -48,7 +48,6 @@ alias nr="cd ~qwerty/NixOSenv && lysander-git && git -C ~/NixOSenv add . && sudo
 alias g='cd ~/GermanMechatronics/ && nvim'
 alias t='cd ~/text/ && nvim'
 alias push_over_https_megacorp='xclip -sel c < push_over_http'
-alias scdl='yt-dlp -x --audio-format mp3 --audio-quality 0 \
-       -S abr,acodec \
-       --embed-thumbnail --embed-metadata \
-       "https://soundcloud.com/luke-lysander"'
+alias scdl='yt-dlp -x --audio-format opus --embed-thumbnail --embed-metadata \
+       --add-metadata --parse-metadata "%(uploader)s:%(artist)s" \
+       "https://soundcloud.com/luke-lysander/likes"'
