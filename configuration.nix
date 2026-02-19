@@ -108,6 +108,7 @@
 
   # Packages
   environment.systemPackages = with pkgs; [
+    rutorrent
     # Core tools
     neovim
     marksman
