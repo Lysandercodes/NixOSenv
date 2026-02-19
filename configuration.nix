@@ -108,8 +108,7 @@
 
   # Packages
   environment.systemPackages = with pkgs; [
-    rutorrent
-    # Core tools
+    qbittorrent # Core tools
     neovim
     marksman
     icu
